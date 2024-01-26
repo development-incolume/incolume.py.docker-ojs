@@ -4,7 +4,7 @@
 # Call example:
 # $ docker-compose -f docker-compose-local.yml up
 
-version: "3.6"
+version: "3.9"
 
 networks:
   inside:
@@ -33,7 +33,7 @@ services:
       - inside
 
   ojs:
-    image: local/ojs:3_2_1-4
+    image: local/ojs:my-pg-3_3_0-15
     build:
       context: .
     restart: unless-stopped
@@ -58,3 +58,43 @@ services:
       - inside
     depends_on:
       - db
+
+  pgsql:
+    image: postgres:14-alpine3.19
+    env_file:
+      - .env
+    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-hom}"
+    tty: true
+    environment:
+      # PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "${OJS_DB_USER:-ojs}"
+      POSTGRES_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
+      POSTGRES_DB: "${OJS_DB_NAME:-ojs}"
+      TERM: xterm-256color
+      # HTTP_PROXY: 'http://10.1.101.101:8080'
+      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
+    # volumes:
+    #  - ./vol/data:/var/lib/postgresql/data/
+    networks:
+      inside:
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: "ojs_pgadmin_${OJS_PGAMIN_NAME:-manage}"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
+      PGADMIN_LISTEN_PORT: 80
+      TERM: xterm-256color
+      # HTTP_PROXY: 'http://10.1.101.101:8080'
+      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+    ports:
+      - '5050:80'
+    restart: unless-stopped
+    volumes:
+      - ./vol/pgadmin:/root/.pgadmin
+    networks:
+      inside:
