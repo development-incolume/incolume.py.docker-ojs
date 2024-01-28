@@ -1,0 +1,100 @@
+# File: docker-compose.yml
+# Access via "http://localhost:8081"
+#
+# Call example:
+# $ docker-compose -f docker-compose-local.yml up
+
+version: "3.9"
+
+networks:
+  inside:
+    external: false
+
+services:
+  db:
+    image: mariadb:10.2
+    restart: unless-stopped
+    env_file:
+      - .env
+    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-ojsPwd}"
+      MYSQL_DATABASE: "${DB_DATABASE:-ojs}"
+      MYSQL_USER: "${DB_USER:-ojs}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-ojsPwd}"
+#    volumes:
+#      - ./volumes/db:/var/lib/mysql
+#      - ./volumes/logs/db:/var/log/mysql
+#      - ./volumes/config/db.charset.conf:/etc/mysql/conf.d/charset.cnf
+#      - ./volumes/migration:/docker-entrypoint-initdb.d
+    networks:
+      - inside
+
+  ojs:
+    image: local/ojs:my-pg-3_3_0-15
+    build:
+      context: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-demo}"
+    hostname: "${COMPOSE_PROJECT_NAME:-demo}"
+    ports:
+      - "${HTTP_PORT:-8081}:80"
+      - "${HTTPS_PORT:-443}:443"
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#      - ./volumes/private:/var/www/files
+#      - ./volumes/public:/var/www/html/public
+#      - ./volumes/logs/app:/var/log/apache2
+#      # WARNING: You can only enable file-volumes if file exists in the container.
+#      - ./volumes/config/ojs.config.inc.php:/var/www/html/config.inc.php
+#      - ./volumes/config/apache.htaccess:/var/www/html/.htaccess
+#      - ./volumes/php.custom.ini:/usr/local/etc/php/conf.d/custom.ini
+
+    networks:
+      - inside
+    depends_on:
+      - db
+
+  pgsql:
+    image: postgres:14-alpine3.19
+    env_file:
+      - .env
+    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-hom}"
+    tty: true
+    environment:
+      # PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_USER: "${OJS_DB_USER:-ojs}"
+      POSTGRES_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
+      POSTGRES_DB: "${OJS_DB_NAME:-ojs}"
+      TERM: xterm-256color
+      # HTTP_PROXY: 'http://10.1.101.101:8080'
+      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+    ports:
+      - "15432:5432"
+    restart: unless-stopped
+    # volumes:
+    #  - ./vol/data:/var/lib/postgresql/data/
+    networks:
+      inside:
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: "ojs_pgadmin_${OJS_PGAMIN_NAME:-manage}"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
+      PGADMIN_LISTEN_PORT: 80
+      TERM: xterm-256color
+      # HTTP_PROXY: 'http://10.1.101.101:8080'
+      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+    ports:
+      - '5050:80'
+    restart: unless-stopped
+    volumes:
+      - ./vol/pgadmin:/root/.pgadmin
+    networks:
+      inside:
