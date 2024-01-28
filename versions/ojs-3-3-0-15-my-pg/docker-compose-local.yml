@@ -63,7 +63,7 @@ services:
     image: postgres:14-alpine3.19
     env_file:
       - .env
-    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-hom}"
+    container_name: "ojs_pgsql_${COMPOSE_PROJECT_NAME:-hom}"
     tty: true
     environment:
       # PGDATA: /var/lib/postgresql/data/pgdata

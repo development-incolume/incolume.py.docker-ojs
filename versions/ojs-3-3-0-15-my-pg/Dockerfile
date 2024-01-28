@@ -174,7 +174,6 @@ RUN set -xe \
     && git config --global url.https://.insteadOf git:// \
     && git config --global advice.detachedHead false \
     && git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
-    && cd /var/www/html/ojs \
     && git submodule update --init --recursive >/dev/null \
     && curl -sS https://getcomposer.org/installer | php81 -- --install-dir=/usr/local/bin --filename=composer.phar \
     && for i in $(find . -name composer.json); do 	   COMPOSERWD=$(echo $i | sed 's/composer.json//'); 	   echo -n " - $COMPOSERWD ... "; 	   composer.phar --working-dir=$COMPOSERWD install --no-dev; 	   echo "Done"; 	done \
@@ -191,11 +190,11 @@ RUN set -xe \
     && rm -rf $(cat /tmp/exclude.list) \
     && apk del --no-cache .build-deps \
     && rm -rf /tmp/* \
-    && rm -rf /root/.cache/*
-    # && find . -name ".git" -exec rm -Rf '{}' \; 2> /dev/null \
-    # && find . -name ".travis.yml" -exec rm -Rf '{}' \; \
-    # && find . -name "test" -exec rm -Rf '{}' \; \
-    # && find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
+    && rm -rf /root/.cache/*  \
+    && find . -name ".git" -exec rm -Rf '{}' \; 2> /dev/null \
+    && find . -name ".travis.yml" -exec rm -Rf '{}' \; \
+    && find . -name "test" -exec rm -Rf '{}' \; \
+    && find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
 
 ENV LD_PRELOAD=/usr/lib/preloadable_libiconv.so
 
