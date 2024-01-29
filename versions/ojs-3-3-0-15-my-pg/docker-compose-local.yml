@@ -33,7 +33,7 @@ services:
       - inside
 
   ojs:
-    image: local/ojs:my-pg-3_3_0-15
+    image: local/ojs:0.1.0-ojs3_3_0-15-my-pg
     build:
       context: .
     restart: unless-stopped
