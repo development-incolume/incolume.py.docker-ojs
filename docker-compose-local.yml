@@ -4,7 +4,7 @@
 # Call example:
 # $ docker-compose -f docker-compose-local.yml up
 
-version: "3.6"
+version: "3.9"
 
 networks:
   inside:

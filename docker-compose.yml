@@ -4,7 +4,7 @@
 # Call example:
 # $ docker-compose up
 
-version: "3.6"
+version: "3.9"
 
 networks:
   inside:
