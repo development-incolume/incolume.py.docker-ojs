@@ -4,11 +4,19 @@ LABEL maintainer="SAJ/PR <ricardo.brito@presidencia.gov.br>"
 
 WORKDIR /var/www/html
 
+ARG HTTP_PROXY=""
+ARG HTTPS_PROXY=""
+ARG OJS_VERSION=3_3_0-15
+
 # When using Composer, disable the warning about running commands as root/super user
 ENV COMPOSER_ALLOW_SUPERUSER=1  \
+    http_proxy=${HTTP_PROXY}  \
+    https_proxy=${HTTPS_PROXY}  \
+    HTTP_PROXY=${HTTP_PROXY}  \
+    HTTPS_PROXY=${HTTPS_PROXY}  \
 	SERVERNAME="localhost"      \
 	HTTPS="on"                  \
-	OJS_VERSION=3_3_0-15 \
+	OJS_VERSION=${OJS_VERSION} \
 	OJS_CLI_INSTALL="0"         \
 	OJS_DB_HOST="localhost"     \
 	OJS_DB_USER="ojs"           \
