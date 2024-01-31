@@ -29,8 +29,30 @@ services:
       - ./vol/pgadmin:/root/.pgadmin
     networks:
       inside:
+
   db:
-    image: postgres:14-alpine3.15
+    image: mariadb:10.2
+    restart: unless-stopped
+    env_file:
+      - .env
+    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-ojsPwd}"
+      MYSQL_DATABASE: "${DB_DATABASE:-ojs}"
+      MYSQL_USER: "${DB_USER:-ojs}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-ojsPwd}"
+    #    volumes:
+    #      - ./volumes/db:/var/lib/mysql
+    #      - ./volumes/logs/db:/var/log/mysql
+    #      - ./volumes/config/db.charset.conf:/etc/mysql/conf.d/charset.cnf
+    #      - ./volumes/migration:/docker-entrypoint-initdb.d
+    networks:
+      - inside
+
+  pgsql:
+    image: postgres:14-alpine3.19
     env_file:
       - .env
     container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-hom}"
@@ -93,5 +115,6 @@ services:
       - inside
     depends_on:
       - db
+      - pgadmin
     restart: unless-stopped
 
