@@ -11,8 +11,7 @@ O principal objetivo deste projeto é realizar a atualização das versões do P
 
 ## Escopo
 
-- OJS
-- 3.2.1-4
+- OJS 3.2.1-4
 - Apache
 - Postgres
 - PHP 7.3
@@ -243,7 +242,7 @@ Graças ao docker, o processo de atualização é fácil e direto.
 
 Antes da atualização você gostaria de [diff](https://linux.die.net/man/1/diff) seu `config.inc.php` com a versão da nova versão do OJS para aprender sobre novas variáveis de configuração. Tenha especial cuidado com os charsets.
 
-### Compatibilidade de versões OJS com PHP 
+### Compatibilidade de versões OJS com PHP
 
 Diferentes versões do OJS são combinadas com diferentes versões do PHP (5 a 8...).
 
@@ -254,17 +253,17 @@ Diferentes versões do OJS são combinadas com diferentes versões do PHP (5 a 8
 |3.3   |>=7.3      |
 |3.4   |>=8.0      |
 
-### Versões PHP 
+### Versões PHP
 
 |VERSÕES|ULTIMA VERSÃO |STATUS DA VERSÃO                    |VIDA ÚTIL     |DATA DE LANÇAMENTO|TERMINO DE SUPORTE|DATA DE OBSOLESCÊNCIA|
 |-------|--------------|------------------------------------|--------------|------------------|------------------|---------------------|
-|7.0    |Não Informado |Não compatível                      |Atingida      |03/12/2015        |10/01/2019        |Não informado        | 
+|7.0    |Não Informado |Não compatível                      |Atingida      |03/12/2015        |10/01/2019        |Não informado        |
 |7.1    |Não Informado |Não compatível                      |Atingida      |01/12/2016        |01/12/2019        |Não informado        |
 |7.2    |7.2.34        |Não compatível                      |Atingida      |30/11/2017        |30/11/2019        |30/11/2020           |
 |7.3    |7.3.33        |Não compatível                      |Atingida      |06/12/2018        |06/12/2020        |06/12/2021           |
 |7.4    |7.4.33        |Não compatível                      |Atingida      |28/11/2019        |28/11/2021        |28/11/2022           |
 |8.0    |8.0.30        |Não compatível                      |Atingida      |26/11/2020        |26/11/2022        |26/11/2023           |
-|8.1    |8.1.27        |Somente correções de segurança      |Não atingida  |25/11/2021        |25/11/2023        |25/11/2024           |    
+|8.1    |8.1.27        |Somente correções de segurança      |Não atingida  |25/11/2021        |25/11/2023        |25/11/2024           |
 |8.2    |8.2.15        |Suportado                           |Não atingida  |08/12/2022        |08/12/2024        |08/12/2025           |
 |8.3    |8.3.2         |Suportado (Versão mais recente)     |Não atingida  |23/11/2023        |23/11/2025        |23/11/2026           |
 |8.4    |Não Lançado   |Não Lançado                         |Não Lançado   |Prevista para 2024|Não Lançado       |Não Lançado          |
@@ -284,7 +283,7 @@ _**Observação:** PHP 8.1 não recomendado para OJS <3.4, devido a problema com
 ## Convensões adotadas
 
 - Semver
-- Keep a Changelog 
+- Keep a Changelog
 - Versionamento Semântico
 - GIT Conventional Commits
 

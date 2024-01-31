@@ -1,5 +1,6 @@
 ## escopo
 
+- alpine 3.11
 - OJS 3.2.1-4
 - Apache
 - Postgresql
