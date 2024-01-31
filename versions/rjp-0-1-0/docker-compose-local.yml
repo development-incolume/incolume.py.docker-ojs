@@ -2,9 +2,9 @@
 # Access via "http://localhost:8081"
 #
 # Call example:
-# $ docker-compose up
+# $ docker-compose -f docker-compose-local.yml up
 
-version: "3.9"
+version: "3.6"
 
 networks:
   inside:
@@ -13,14 +13,17 @@ networks:
 services:
   db:
     image: mariadb:10.2
+    restart: unless-stopped
     env_file:
       - .env
     container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
+    ports:
+      - 3306:3306
     environment:
-      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-ojsPwd}"
-      MYSQL_DATABASE: "${MYSQL_DATABASE:-ojs}"
-      MYSQL_USER: "${MYSQL_USER:-ojs}"
-      MYSQL_PASSWORD: "${MYSQL_PASSWORD:-ojsPwd}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-ojsPwd}"
+      MYSQL_DATABASE: "${DB_DATABASE:-ojs}"
+      MYSQL_USER: "${DB_USER:-ojs}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-ojsPwd}"
 #    volumes:
 #      - ./volumes/db:/var/lib/mysql
 #      - ./volumes/logs/db:/var/log/mysql
@@ -28,10 +31,12 @@ services:
 #      - ./volumes/migration:/docker-entrypoint-initdb.d
     networks:
       - inside
-    restart: unless-stopped
 
   ojs:
-    image: pkpofficial/ojs:${OJS_VERSION:-3_2_1-4}
+    image: local/ojs:3_2_1-4
+    build:
+      context: .
+    restart: unless-stopped
     env_file:
       - .env
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-demo}"
@@ -53,4 +58,3 @@ services:
       - inside
     depends_on:
       - db
-    restart: unless-stopped

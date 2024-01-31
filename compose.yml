@@ -2,7 +2,7 @@
 # Access via "http://localhost:8081"
 #
 # Call example:
-# $ docker-compose up
+# $ docker-compose -f compose.yml up -d
 
 version: "3.9"
 
@@ -13,6 +13,7 @@ networks:
 
 services:
   pgadmin:
+    restart: unless-stopped
     image: dpage/pgadmin4
     container_name: "ojs_pgadmin_${OJS_PGAMIN_NAME:-manage}"
     environment:
@@ -24,16 +25,37 @@ services:
       # HTTPS_PROXY: 'http://10.1.101.101:8080'
     ports:
       - '5050:80'
-    restart: unless-stopped
     volumes:
       - ./vol/pgadmin:/root/.pgadmin
     networks:
       inside:
+
   db:
-    image: postgres:14-alpine3.15
+    image: mariadb:10.2
+    restart: unless-stopped
     env_file:
       - .env
-    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-hom}"
+    container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-ojsPwd}"
+      MYSQL_DATABASE: "${DB_DATABASE:-ojs}"
+      MYSQL_USER: "${DB_USER:-ojs}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-ojsPwd}"
+    #    volumes:
+    #      - ./volumes/db:/var/lib/mysql
+    #      - ./volumes/logs/db:/var/log/mysql
+    #      - ./volumes/config/db.charset.conf:/etc/mysql/conf.d/charset.cnf
+    #      - ./volumes/migration:/docker-entrypoint-initdb.d
+    networks:
+      - inside
+
+  pgsql:
+    image: postgres:14-alpine3.19
+    env_file:
+      - .env
+    container_name: "ojs_pgsql_${COMPOSE_PROJECT_NAME:-hom}"
     tty: true
     environment:
       # PGDATA: /var/lib/postgresql/data/pgdata
@@ -41,8 +63,10 @@ services:
       POSTGRES_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
       POSTGRES_DB: "${OJS_DB_NAME:-ojs}"
       TERM: xterm-256color
-      # HTTP_PROXY: 'http://10.1.101.101:8080'
-      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+      http_proxy: ${HTTP_PROXY:-}
+      https_proxy: ${HTTPS_PROXY:-}
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -52,18 +76,20 @@ services:
       inside:
 
   ojs:
-    image: incolume/ojs:3_2_1-4
+    image: incolume/rjp:0.1.1
     env_file:
       - .env
     build:
       args:
+        HTTP_PROXY: ${HTTP_PROXY:-}
+        HTTPS_PROXY: ${HTTPS_PROXY:-}
         OJS_VERSION: "3_2_1-4"
         OJS_CLI_INSTALL: "0"
         OJS_DB_HOST: db
         OJS_DB_USER: "${OJS_DB_USER:-ojs}"
         OJS_DB_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
         OJS_DB_NAME: "${OJS_DB_NAME:-ojs}"
-      context: .
+      context: ./versions/rjp-0-1-0/
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
     environment:
       SERVERNAME: "${SERVERNAME:-localhost}"
@@ -74,12 +100,12 @@ services:
     ports:
       - "${HTTP_PORT:-8081}:80"
       - "${HTTPS_PORT:-1443}:443"
-    volumes:
-      - /etc/localtime:/etc/localtime
-      - ./vol/private:/var/www/files
-      - ./vol/public:/var/www/html/public
-      - ./vol/logs/app:/var/log/apache2
-      - ./vol/app-hom/ojs-3.2.1-4/:/var/www/html/
+#    volumes:
+#      - /etc/localtime:/etc/localtime
+#      - ./vol/private:/var/www/files
+#      - ./vol/public:/var/www/html/public
+#      - ./vol/logs/app:/var/log/apache2
+#      - ./vol/app-hom/ojs-3.2.1-4/:/var/www/html/
 #      # WARNING: You can only enable file-volumes if file exists in the container.
 #      - ./vol/config/ojs.config.inc.php:/var/www/html/config.inc.php
 #      - ./vol/config/apache.htaccess:/var/www/html/.htaccess
@@ -89,5 +115,6 @@ services:
       - inside
     depends_on:
       - db
+      - pgadmin
     restart: unless-stopped
 
