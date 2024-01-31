@@ -41,8 +41,8 @@ services:
       POSTGRES_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
       POSTGRES_DB: "${OJS_DB_NAME:-ojs}"
       TERM: xterm-256color
-      # HTTP_PROXY: 'http://10.1.101.101:8080'
-      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
     ports:
       - "5432:5432"
     restart: unless-stopped
@@ -52,7 +52,7 @@ services:
       inside:
 
   ojs:
-    image: incolume/ojs:3_2_1-4
+    image: incolume/rjp:0.1.0
     env_file:
       - .env
     build:
@@ -63,7 +63,7 @@ services:
         OJS_DB_USER: "${OJS_DB_USER:-ojs}"
         OJS_DB_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
         OJS_DB_NAME: "${OJS_DB_NAME:-ojs}"
-      context: .
+      context: ./versions/rjp-0-1-0/
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
     environment:
       SERVERNAME: "${SERVERNAME:-localhost}"
