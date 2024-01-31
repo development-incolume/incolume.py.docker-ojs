@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
 
   ojs:
-    image: pkpofficial/ojs:3_3_0-15
+    image: pkpofficial/ojs:${OJS_VERSION:-3_2_1-4}
     env_file:
       - .env
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-demo}"
