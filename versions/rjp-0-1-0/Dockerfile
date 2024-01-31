@@ -4,8 +4,15 @@ LABEL maintainer="Public Knowledge Project <marc.bria@gmail.com>"
 
 WORKDIR /var/www/html
 
+ARG HTTP_PROXY=""
+ARG HTTPS_PROXY=""
+
 # When using Composer, disable the warning about running commands as root/super user
 ENV COMPOSER_ALLOW_SUPERUSER=1  \
+    http_proxy=${HTTP_PROXY}  \
+    https_proxy=${HTTPS_PROXY}  \
+    HTTP_PROXY=${HTTP_PROXY}  \
+    HTTPS_PROXY=${HTTPS_PROXY}  \
 	SERVERNAME="localhost"      \
 	HTTPS="on"                  \
 	OJS_VERSION=3_2_1-4 \
