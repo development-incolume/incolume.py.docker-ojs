@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:3.17
 
 LABEL maintainer="SAJ/PR <ricardo.brito@presidencia.gov.br>"
 
