@@ -76,6 +76,8 @@ services:
       inside:
 
   ojs:
+    container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
+    hostname: "${COMPOSE_PROJECT_NAME:-demo}"
     image: incolume/rjp:0.2.0
     env_file:
       - .env
@@ -90,13 +92,11 @@ services:
         OJS_DB_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
         OJS_DB_NAME: "${OJS_DB_NAME:-ojs}"
       context: ./versions/rjp-0-2-0/
-    container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
     environment:
       SERVERNAME: "${SERVERNAME:-localhost}"
       TERM: xterm-256color
       # HTTP_PROXY: 'http://10.1.101.101:8080'
       # HTTPS_PROXY: 'http://10.1.101.101:8080'
-    hostname: "${COMPOSE_PROJECT_NAME:-demo}"
     ports:
       - "${HTTP_PORT:-8081}:80"
       - "${HTTPS_PORT:-1443}:443"
@@ -115,6 +115,6 @@ services:
       - inside
     depends_on:
       - db
-      - pgadmin
+      - pgsql
     restart: unless-stopped
 

@@ -206,16 +206,18 @@ RUN set -xe
 RUN apk add --no-cache --virtual .build-deps $BUILDERS
 RUN apk add --no-cache $PACKAGES
 RUN apk add --no-cache $PHP_EXTENSIONS
-# RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.17/community/ gnu-libiconv=1.17-r0
-# RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs-16.20.2-r0
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ nodejs
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
 RUN git config --global url.https://.insteadOf git://
 RUN git config --global advice.detachedHead false
 RUN git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git .
 RUN git submodule update --init --recursive >/dev/null
 RUN curl -sS https://getcomposer.org/installer | php81 -- --install-dir=/usr/local/bin --filename=composer.phar
-RUN for i in $(find . -name composer.json); do 	   COMPOSERWD=$(echo $i | sed 's/composer.json//'); 	   echo -n " - $COMPOSERWD ... "; 	   composer.phar --working-dir=$COMPOSERWD install --no-dev; 	   echo "Done"; 	done
+RUN for i in $(find . -name composer.json); do \
+      COMPOSERWD=$(echo $i | sed 's/composer.json//'); \
+      echo -n " - $COMPOSERWD ... "; \
+      composer.phar --working-dir=$COMPOSERWD install --no-dev; \
+      echo "Done"; \
+      done
 RUN npm ci -y
 RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
 RUN mkdir -p /var/www/files /run/apache2
@@ -230,7 +232,7 @@ RUN rm -rf $(cat /tmp/exclude.list)
 RUN apk del --no-cache .build-deps
 RUN rm -rf /tmp/*
 RUN rm -rf /root/.cache/*
-RUN find . -name ".git" -exec rm -Rf '{}' \; 2> /dev/null
+RUN find . -name ".git" -exec rm -Rf '{}' \;
 RUN find . -name ".travis.yml" -exec rm -Rf '{}' \;
 RUN find . -name "test" -exec rm -Rf '{}' \;
 RUN find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
