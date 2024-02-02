@@ -114,8 +114,8 @@ RUN set -xe \
  	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
 	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
 	# Node joins to the party:
-    && npm config set proxy ${HTTPS_PROXY}  \
-    && rm -rf package-lock.json  \
+#    && npm config set proxy ${HTTPS_PROXY}  \
+#    && rm -rf package-lock.json  \
     && npm install -y \
     # && npm run build \
     # && npm ci -y   \
