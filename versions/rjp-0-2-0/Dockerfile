@@ -114,8 +114,11 @@ RUN set -xe \
  	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
 	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
 	# Node joins to the party:
-	&& npm install -y \
-    && npm run build \
+    && npm config set proxy ${HTTPS_PROXY} \
+	# && npm install -y \
+    # && npm run build \
+    && npm ci -y   \
+    && NODE_OPTIONS=--openssl-legacy-provider npm run build  \
 # Create directories
  	&& mkdir -p /var/www/files /run/apache2  \
 	&& cp config.TEMPLATE.inc.php config.inc.php \
