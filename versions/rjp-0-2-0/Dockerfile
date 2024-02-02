@@ -45,6 +45,7 @@ ENV PACKAGES 		\
 
 # PHP extensions
 ENV PHP_EXTENSIONS	\
+    gnu-libiconv    \
     php81-bcmath		\
     php81-bz2		\
     php81-calendar	\
@@ -95,8 +96,8 @@ RUN set -xe \
 	&& apk add --no-cache --virtual .build-deps $BUILDERS \
 	&& apk add --no-cache $PACKAGES \
 	&& apk add --no-cache $PHP_EXTENSIONS \
-	&& apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2 \
-	&& apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0 \
+	# && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2 \
+	# && apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0 \
 # Building OJS:
 	# Configure and download code from git
 	&& git config --global url.https://.insteadOf git:// \
