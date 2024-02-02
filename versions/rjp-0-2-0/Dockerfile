@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.17
 
 LABEL maintainer="SAJ/PR <ricardo.brito@presidencia.gov.br>"
 
@@ -121,7 +121,7 @@ ENV PHP_EXTENSIONS  \
 # Required to build OJS:
 ENV BUILDERS 		\
 	git 			\
-	# nodejs 			\
+	nodejs 			\
 	npm
 
 # To make a smaller image, we start with the copy.
@@ -218,8 +218,8 @@ RUN for i in $(find . -name composer.json); do \
       composer.phar --working-dir=$COMPOSERWD install --no-dev; \
       echo "Done"; \
       done
-RUN npm ci -y
-RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
+# RUN npm ci -y
+# RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
 RUN mkdir -p /var/www/files /run/apache2
 RUN cp config.TEMPLATE.inc.php config.inc.php
 RUN chown -R apache:apache /var/www/*
@@ -232,9 +232,9 @@ RUN rm -rf $(cat /tmp/exclude.list)
 RUN apk del --no-cache .build-deps
 RUN rm -rf /tmp/*
 RUN rm -rf /root/.cache/*
-RUN find . -name ".git" -exec rm -Rf '{}' \;
-RUN find . -name ".travis.yml" -exec rm -Rf '{}' \;
-RUN find . -name "test" -exec rm -Rf '{}' \;
+# RUN find . -name ".git" -exec rm -Rf '{}' \;
+# RUN find . -name ".travis.yml" -exec rm -Rf '{}' \;
+# RUN find . -name "test" -exec rm -Rf '{}' \;
 RUN find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
 
 ENV LD_PRELOAD=/usr/lib/preloadable_libiconv.so
