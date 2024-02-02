@@ -91,98 +91,52 @@ ENV BUILDERS 		\
 # This let us joining runs in a single layer.
 COPY exclude.list /tmp/exclude.list
 
-RUN set -xe
-RUN apk add --no-cache --virtual .build-deps $BUILDERS
-RUN apk add --no-cache $PACKAGES
-RUN apk add --no-cache $PHP_EXTENSIONS
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
-# RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0
+RUN set -xe \
+	&& apk add --no-cache --virtual .build-deps $BUILDERS \
+	&& apk add --no-cache $PACKAGES \
+	&& apk add --no-cache $PHP_EXTENSIONS \
+	&& apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2 \
+	&& apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0 \
 # Building OJS:
 	# Configure and download code from git
-RUN git config --global url.https://.insteadOf git://
-RUN git config --global advice.detachedHead false
-RUN git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git .
-RUN git submodule update --init --recursive >/dev/null
+	&& git config --global url.https://.insteadOf git:// \
+	&& git config --global advice.detachedHead false \
+	&& git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
+	&& git submodule update --init --recursive >/dev/null \
 	# Composer vudu:
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
+ 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
 	# To avoid timeouts with gitHub we use tokens:
 	# TODO: Replace personal token by an official one.
  	# && composer.phar config -g github-oauth.github.com 58778f1c172c09f3add6cb559cbadd55de967d47 \
 	# Install Composer Deps:
-RUN composer.phar --working-dir=lib/pkp install --no-dev
-RUN composer.phar --working-dir=plugins/paymethod/paypal install --no-dev
-RUN composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev
+ 	&& composer.phar --working-dir=lib/pkp install --no-dev \
+ 	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
+	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
 	# Node joins to the party:
-RUN npm install -y
-RUN npm run build
+	&& npm install -y \
+    && npm run build \
 # Create directories
-RUN mkdir -p /var/www/files /run/apache2
-RUN cp config.TEMPLATE.inc.php config.inc.php
-RUN chown -R apache:apache /var/www/*
+ 	&& mkdir -p /var/www/files /run/apache2  \
+	&& cp config.TEMPLATE.inc.php config.inc.php \
+	&& chown -R apache:apache /var/www/* \
 # Prepare freefont for captcha
-RUN ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf
+	&& ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf \
 # Prepare crontab
-RUN echo "0 * * * *   ojs-run-scheduled" | crontab -
+	&& echo "0 * * * *   ojs-run-scheduled" | crontab - \
 # Prepare httpd.conf
-RUN sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf
-RUN sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf
+	&& sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf \
+	&& sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf \
 # Clear the image (list of files to be deleted in exclude.list).
-RUN cd /var/www/html
-RUN rm -rf $(cat /tmp/exclude.list)
-RUN apk del --no-cache .build-deps
-RUN rm -rf /tmp/*
-RUN rm -rf /root/.cache/*
+	&& cd /var/www/html \
+ 	&& rm -rf $(cat /tmp/exclude.list) \
+	&& apk del --no-cache .build-deps \
+	&& rm -rf /tmp/* \
+	&& rm -rf /root/.cache/* \
 # Some folders are not required (as .git .travis.yml test .gitignore .gitmodules ...)
-RUN find . -name ".git" -exec rm -Rf '{}' \;
-RUN find . -name ".travis.yml" -exec rm -Rf '{}' \;
-RUN find . -name "test" -exec rm -Rf '{}' \;
-RUN find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
-
-# RUN set -xe \
-# 	&& apk add --no-cache --virtual .build-deps $BUILDERS \
-# 	&& apk add --no-cache $PACKAGES \
-# 	&& apk add --no-cache $PHP_EXTENSIONS \
-#   && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
-# # Building OJS:
-# 	# Configure and download code from git
-# 	&& git config --global url.https://.insteadOf git:// \
-# 	&& git config --global advice.detachedHead false \
-# 	&& git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
-# 	&& git submodule update --init --recursive >/dev/null \
-# 	# Composer vudu:
-#  	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
-# 	# To avoid timeouts with gitHub we use tokens:
-# 	# TODO: Replace personal token by an official one.
-#  	# && composer.phar config -g github-oauth.github.com 58778f1c172c09f3add6cb559cbadd55de967d47 \
-# 	# Install Composer Deps:
-#  	&& composer.phar --working-dir=lib/pkp install --no-dev \
-#  	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
-# 	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
-# 	# Node joins to the party:
-# 	&& npm install -y \
-#     && npm run build \
-# # Create directories
-#  	&& mkdir -p /var/www/files /run/apache2  \
-# 	&& cp config.TEMPLATE.inc.php config.inc.php \
-# 	&& chown -R apache:apache /var/www/* \
-# # Prepare freefont for captcha
-# 	&& ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf \
-# # Prepare crontab
-# 	&& echo "0 * * * *   ojs-run-scheduled" | crontab - \
-# # Prepare httpd.conf
-# 	&& sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf \
-# 	&& sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf \
-# # Clear the image (list of files to be deleted in exclude.list).
-# 	&& cd /var/www/html \
-#  	&& rm -rf $(cat /tmp/exclude.list) \
-# 	&& apk del --no-cache .build-deps \
-# 	&& rm -rf /tmp/* \
-# 	&& rm -rf /root/.cache/* \
-# # Some folders are not required (as .git .travis.yml test .gitignore .gitmodules ...)
-# 	&& find . -name ".git" -exec rm -Rf '{}' \; \
-# 	&& find . -name ".travis.yml" -exec rm -Rf '{}' \; \
-# 	&& find . -name "test" -exec rm -Rf '{}' \; \
-# 	&& find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
+	&& find . -name ".git" -exec rm -Rf '{}' \; \
+	&& find . -name ".travis.yml" -exec rm -Rf '{}' \; \
+	&& find . -name "test" -exec rm -Rf '{}' \; \
+	&& find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
 
 COPY root/ /
 
