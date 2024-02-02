@@ -117,9 +117,9 @@ RUN set -xe \
     # && npm config set proxy ${HTTPS_PROXY}  \
     && rm -rf package-lock.json  \
     && npm install -y \
-    && npm run build \
+    # && npm run build \
     # && npm ci -y   \
-    # && NODE_OPTIONS=--openssl-legacy-provider npm run build  \
+    && NODE_OPTIONS=--openssl-legacy-provider npm run build  \
 # Create directories
  	&& mkdir -p /var/www/files /run/apache2  \
 	&& cp config.TEMPLATE.inc.php config.inc.php \
