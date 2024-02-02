@@ -95,6 +95,7 @@ RUN set -xe
 RUN apk add --no-cache --virtual .build-deps $BUILDERS
 RUN apk add --no-cache $PACKAGES
 RUN apk add --no-cache $PHP_EXTENSIONS
+RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
 # RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0
 # Building OJS:
 	# Configure and download code from git
@@ -141,6 +142,7 @@ RUN find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm
 # 	&& apk add --no-cache --virtual .build-deps $BUILDERS \
 # 	&& apk add --no-cache $PACKAGES \
 # 	&& apk add --no-cache $PHP_EXTENSIONS \
+#   && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
 # # Building OJS:
 # 	# Configure and download code from git
 # 	&& git config --global url.https://.insteadOf git:// \
