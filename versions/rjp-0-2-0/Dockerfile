@@ -84,7 +84,7 @@ ENV PHP_EXTENSIONS	\
 # Required to build OJS:
 ENV BUILDERS 		\
 	git 			\
-	nodejs=16.20.2-r0			\
+	nodejs 			\
 	npm
 
 # To make a smaller image, we start with the copy.
