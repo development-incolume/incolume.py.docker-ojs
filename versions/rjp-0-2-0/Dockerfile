@@ -1,6 +1,6 @@
-FROM alpine:3.16
+FROM alpine:3.17
 
-LABEL maintainer="SAJ/PR <ricardo.brito@presidencia.gov.br>"
+LABEL maintainer="Ricardo Brito do Nascimento <ricardo.brito@presidencia.gov.br>"
 
 WORKDIR /var/www/html
 
@@ -27,217 +27,120 @@ ENV COMPOSER_ALLOW_SUPERUSER=1  \
 
 
 # PHP_INI_DIR to be symmetrical with official php docker image
-# ENV PHP_INI_DIR /etc/php/7.3
-ENV PHP_INI_DIR=/etc/php/8.1
+ENV PHP_INI_DIR /etc/php/8.1
 
 # Basic packages
 ENV PACKAGES 		\
-    apache2         \
-    apache2-ssl     \
-    apache2-utils   \
-    ca-certificates         \
-    curl    \
-    ttf-freefont    \
-    dcron   \
-    patch   \
-    php81   \
-    php81-apache2   \
-    runit
+	apache2 		\
+	apache2-ssl 	\
+	apache2-utils 	\
+	ca-certificates \
+	curl 			\
+	ttf-freefont	\
+	dcron 			\
+	patch			\
+	php81			\
+	php81-apache2	\
+	runit
 
 # PHP extensions
-# ENV PHP_EXTENSIONS	\
-# 	php7-bcmath		\
-# 	php7-bz2		\
-# 	php7-calendar	\
-# 	php7-ctype		\
-# 	php7-curl		\
-# 	php7-dom		\
-# 	php7-exif		\
-# 	php7-fileinfo	\
-# 	php7-ftp		\
-# 	php7-gettext	\
-# 	php7-intl		\
-# 	php7-iconv		\
-# 	php7-json		\
-# 	php7-mbstring	\
-# 	php7-mysqli		\
-# 	php7-opcache	\
-# 	php7-openssl	\
-# 	php7-pdo_mysql	\
-# 	php7-phar		\
-# 	php7-posix		\
-# 	php7-session	\
-# 	php7-shmop		\
-# 	php7-simplexml	\
-# 	php7-sockets	\
-# 	php7-sysvmsg	\
-# 	php7-sysvsem	\
-# 	php7-sysvshm	\
-# 	php7-tokenizer	\
-# 	php7-xml		\
-# 	php7-xmlreader	\
-# 	php7-xmlwriter	\
-# 	php7-zip		\
-# 	php7-zlib
-
-ENV PHP_EXTENSIONS  \
-    php81-bcmath    \
-    php81-bz2       \
-    php81-calendar  \
-    php81-ctype     \
-    php81-curl      \
-    php81-dom       \
-    php81-exif      \
-    php81-fileinfo  \
-    php81-ftp       \
-    php81-gettext   \
-    php81-intl      \
-    php81-iconv     \
+ENV PHP_EXTENSIONS	\
     gnu-libiconv    \
-    php81-json      \
-    php81-mbstring  \
-    php81-mysqli    \
-    php81-opcache   \
-    php81-openssl   \
-    php81-pdo_mysql \
-    php81-phar      \
-    php81-posix     \
-    php81-session   \
-    php81-shmop     \
-    php81-simplexml \
-    php81-sockets   \
-    php81-sysvmsg   \
-    php81-sysvsem   \
-    php81-sysvshm   \
-    php81-tokenizer \
-    php81-xml       \
-    php81-xmlreader \
-    php81-xmlwriter \
-    php81-zip       \
-    php81-pgsql     \
-    php81-pdo_pgsql \
+    php81-bcmath		\
+    php81-bz2		\
+    php81-calendar	\
+    php81-ctype		\
+    php81-curl		\
+    php81-dom		\
+    php81-exif		\
+    php81-fileinfo	\
+    php81-ftp		\
+    php81-gettext	\
+    php81-iconv		\
+    php81-intl		\
+    php81-json		\
+    php81-mbstring	\
+    php81-mysqli		\
+    php81-opcache	\
+    php81-openssl	\
+    php81-pdo_mysql	\
+    php81-phar		\
+    php81-posix		\
+    php81-session	\
+    php81-shmop		\
+    php81-simplexml	\
+    php81-sockets	\
+    php81-sysvmsg	\
+    php81-sysvsem	\
+    php81-sysvshm	\
+    php81-tokenizer	\
+    php81-xml		\
+    php81-xmlreader	\
+    php81-xmlwriter	\
+    php81-zip		\
+    php81-pdo_pgsql  \
+    php81-pgsql      \
     php81-zlib
 
 # Required to build OJS:
 ENV BUILDERS 		\
 	git 			\
-	# nodejs 			\
+	nodejs 			\
 	npm
 
 # To make a smaller image, we start with the copy.
 # This let us joining runs in a single layer.
 COPY exclude.list /tmp/exclude.list
 
-# RUN set -xe \
-# 	&& apk add --no-cache --virtual .build-deps $BUILDERS \
-# 	&& apk add --no-cache $PACKAGES \
-# 	&& apk add --no-cache $PHP_EXTENSIONS \
-# # Building OJS:
-# 	# Configure and download code from git
-# 	&& git config --global url.https://.insteadOf git:// \
-# 	&& git config --global advice.detachedHead false \
-# 	&& git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
-# 	&& git submodule update --init --recursive >/dev/null \
-# 	# Composer vudu:
-#  	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
-# 	# To avoid timeouts with gitHub we use tokens:
-# 	# TODO: Replace personal token by an official one.
-#  	# && composer.phar config -g github-oauth.github.com 58778f1c172c09f3add6cb559cbadd55de967d47 \
-# 	# Install Composer Deps:
-#  	&& composer.phar --working-dir=lib/pkp install --no-dev \
-#  	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
-# 	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
-# 	# Node joins to the party:
-# 	&& npm install -y && npm run build \
-# # Create directories
-#  	&& mkdir -p /var/www/files /run/apache2  \
-# 	&& cp config.TEMPLATE.inc.php config.inc.php \
-# 	&& chown -R apache:apache /var/www/* \
-# # Prepare freefont for captcha
-# 	&& ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf \
-# # Prepare crontab
-# 	&& echo "0 * * * *   ojs-run-scheduled" | crontab - \
-# # Prepare httpd.conf
-# 	&& sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf \
-# 	&& sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf \
-# # Clear the image (list of files to be deleted in exclude.list).
-# 	&& cd /var/www/html \
-#  	&& rm -rf $(cat /tmp/exclude.list) \
-# 	&& apk del --no-cache .build-deps \
-# 	&& rm -rf /tmp/* \
-# 	&& rm -rf /root/.cache/* \
-# # Some folders are not required (as .git .travis.yml test .gitignore .gitmodules ...)
-# 	&& find . -name ".git" -exec rm -Rf '{}' \; \
-# 	&& find . -name ".travis.yml" -exec rm -Rf '{}' \; \
-# 	&& find . -name "test" -exec rm -Rf '{}' \; \
-# 	&& find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
-
-# RUN set -xe \
-# 	&& apk add --no-cache --virtual .build-deps $BUILDERS \
-#     && apk add --no-cache $PACKAGES \
-#     && apk add --no-cache $PHP_EXTENSIONS \
-#     && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.19/community/ gnu-libiconv=1.17-r2 \
-#     && git config --global url.https://.insteadOf git:// \
-#     && git config --global advice.detachedHead false \
-#     && git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
-#     && git submodule update --init --recursive >/dev/null \
-#     && curl -sS https://getcomposer.org/installer | php81 -- --install-dir=/usr/local/bin --filename=composer.phar \
-#     && for i in $(find . -name composer.json); do 	   COMPOSERWD=$(echo $i | sed 's/composer.json//'); 	   echo -n " - $COMPOSERWD ... "; 	   composer.phar --working-dir=$COMPOSERWD install --no-dev; 	   echo "Done"; 	done \
-#     && npm ci -y \
-#     && NODE_OPTIONS=--openssl-legacy-provider npm run build \
-#     && mkdir -p /var/www/files /run/apache2 \
-#     && cp config.TEMPLATE.inc.php config.inc.php \
-#     && chown -R apache:apache /var/www/* \
-#     && ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf \
-#     && echo "0 * * * *   ojs-run-scheduled" | crontab - \
-#     && sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf \
-#     && sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf \
-#     && cd /var/www/html \
-#     && rm -rf $(cat /tmp/exclude.list) \
-#     && apk del --no-cache .build-deps \
-#     && rm -rf /tmp/* \
-#     && rm -rf /root/.cache/*  \
-#     && find . -name ".git" -exec rm -Rf '{}' \; 2> /dev/null \
-#     && find . -name ".travis.yml" -exec rm -Rf '{}' \; \
-#     && find . -name "test" -exec rm -Rf '{}' \; \
-#     && find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
-
-RUN set -xe
-RUN apk add --no-cache --virtual .build-deps $BUILDERS
-RUN apk add --no-cache $PACKAGES
-RUN apk add --no-cache $PHP_EXTENSIONS
-RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2
-RUN git config --global url.https://.insteadOf git://
-RUN git config --global advice.detachedHead false
-RUN git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git .
-RUN git submodule update --init --recursive >/dev/null
-RUN curl -sS https://getcomposer.org/installer | php81 -- --install-dir=/usr/local/bin --filename=composer.phar
-RUN for i in $(find . -name composer.json); do \
-      COMPOSERWD=$(echo $i | sed 's/composer.json//'); \
-      echo -n " - $COMPOSERWD ... "; \
-      composer.phar --working-dir=$COMPOSERWD install --no-dev; \
-      echo "Done"; \
-      done
-RUN npm ci -y
-RUN NODE_OPTIONS=--openssl-legacy-provider npm run build
-RUN mkdir -p /var/www/files /run/apache2
-RUN cp config.TEMPLATE.inc.php config.inc.php
-RUN chown -R apache:apache /var/www/*
-RUN ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf
-RUN echo "0 * * * *   ojs-run-scheduled" | crontab -
-RUN sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf
-RUN sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf
-RUN cd /var/www/html
-RUN rm -rf $(cat /tmp/exclude.list)
-RUN apk del --no-cache .build-deps
-RUN rm -rf /tmp/*
-RUN rm -rf /root/.cache/*
-RUN find . -name ".git" -exec rm -Rf '{}' \;
-RUN find . -name ".travis.yml" -exec rm -Rf '{}' \;
-RUN find . -name "test" -exec rm -Rf '{}' \;
-RUN find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
-
-ENV LD_PRELOAD=/usr/lib/preloadable_libiconv.so
+RUN set -xe \
+	&& apk add --no-cache --virtual .build-deps $BUILDERS \
+	&& apk add --no-cache $PACKAGES \
+	&& apk add --no-cache $PHP_EXTENSIONS \
+	# && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.12/community/ gnu-libiconv=1.15-r2 \
+	# && apk add --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.16/main/ nodejs=16.20.2-r0 \
+# Building OJS:
+	# Configure and download code from git
+	&& git config --global url.https://.insteadOf git:// \
+	&& git config --global advice.detachedHead false \
+	&& git clone --depth 1 --single-branch --branch $OJS_VERSION --progress https://github.com/pkp/ojs.git . \
+	&& git submodule update --init --recursive >/dev/null \
+	# Composer vudu:
+ 	&& curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer.phar \
+	# To avoid timeouts with gitHub we use tokens:
+	# TODO: Replace personal token by an official one.
+ 	# && composer.phar config -g github-oauth.github.com 58778f1c172c09f3add6cb559cbadd55de967d47 \
+	# Install Composer Deps:
+ 	&& composer.phar --working-dir=lib/pkp install --no-dev \
+ 	&& composer.phar --working-dir=plugins/paymethod/paypal install --no-dev \
+	&& composer.phar --working-dir=plugins/generic/citationStyleLanguage install --no-dev \
+	# Node joins to the party:
+    && npm config set proxy ${HTTPS_PROXY} \
+	# && npm install -y \
+    # && npm run build \
+    && npm ci -y   \
+    && NODE_OPTIONS=--openssl-legacy-provider npm run build  \
+# Create directories
+ 	&& mkdir -p /var/www/files /run/apache2  \
+	&& cp config.TEMPLATE.inc.php config.inc.php \
+	&& chown -R apache:apache /var/www/* \
+# Prepare freefont for captcha
+	&& ln -s /usr/share/fonts/TTF/FreeSerif.ttf /usr/share/fonts/FreeSerif.ttf \
+# Prepare crontab
+	&& echo "0 * * * *   ojs-run-scheduled" | crontab - \
+# Prepare httpd.conf
+	&& sed -i -e '\#<Directory />#,\#</Directory>#d' /etc/apache2/httpd.conf \
+	&& sed -i -e "s/^ServerSignature.*/ServerSignature Off/" /etc/apache2/httpd.conf \
+# Clear the image (list of files to be deleted in exclude.list).
+	&& cd /var/www/html \
+ 	&& rm -rf $(cat /tmp/exclude.list) \
+	&& apk del --no-cache .build-deps \
+	&& rm -rf /tmp/* \
+	&& rm -rf /root/.cache/* \
+# Some folders are not required (as .git .travis.yml test .gitignore .gitmodules ...)
+	&& find . -name ".git" -exec rm -Rf '{}' \; \
+	&& find . -name ".travis.yml" -exec rm -Rf '{}' \; \
+	&& find . -name "test" -exec rm -Rf '{}' \; \
+	&& find . \( -name .gitignore -o -name .gitmodules -o -name .keepme \) -exec rm -Rf '{}' \;
 
 COPY root/ /
 
