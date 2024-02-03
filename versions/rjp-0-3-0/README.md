@@ -1,10 +1,10 @@
 ## escopo
 
-- alpine 3.17
-- OJS 3.3.0-15
+- alpine 3.18
+- OJS 3.3.0-16
 - Apache
 - Postgresql
-- PHP81
+- PHP 8.1.26
 
 
 Construir imagem passando proxy do ambiente

@@ -31,8 +31,8 @@ services:
       inside:
 
   db:
-    image: mariadb:10.2
     restart: unless-stopped
+    image: mariadb:10.2
     env_file:
       - .env
     container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
@@ -52,6 +52,7 @@ services:
       - inside
 
   pgsql:
+    restart: unless-stopped
     image: postgres:14-alpine3.19
     env_file:
       - .env
@@ -69,29 +70,29 @@ services:
       https_proxy: ${HTTPS_PROXY:-}
     ports:
       - "5432:5432"
-    restart: unless-stopped
     # volumes:
     #  - ./vol/data:/var/lib/postgresql/data/
     networks:
       inside:
 
   ojs:
+    restart: unless-stopped
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
     hostname: "${COMPOSE_PROJECT_NAME:-demo}"
-    image: incolume/rjp:0.2.0
+    image: incolume/rjp:0.3.0
     env_file:
       - .env
     build:
       args:
-        HTTP_PROXY: ${HTTP_PROXY:-}
-        HTTPS_PROXY: ${HTTPS_PROXY:-}
-        OJS_VERSION: "3_3_0-15"
+        HTTP_PROXY: "${HTTP_PROXY:-}"
+        HTTPS_PROXY: "${HTTPS_PROXY:-}"
+        OJS_VERSION: "${OJS_VERSION:-3_3_0-16}"
         OJS_CLI_INSTALL: "0"
         OJS_DB_HOST: db
         OJS_DB_USER: "${OJS_DB_USER:-ojs}"
         OJS_DB_PASSWORD: "${OJS_DB_PASSWORD:-ojsPwd}"
         OJS_DB_NAME: "${OJS_DB_NAME:-ojs}"
-      context: ./versions/rjp-0-2-0/
+      context: ./versions/rjp-0-3-0/
     environment:
       SERVERNAME: "${SERVERNAME:-localhost}"
       TERM: xterm-256color
@@ -116,5 +117,4 @@ services:
     depends_on:
       - db
       - pgsql
-    restart: unless-stopped
 
