@@ -96,8 +96,8 @@ services:
     environment:
       SERVERNAME: "${SERVERNAME:-localhost}"
       TERM: xterm-256color
-      # HTTP_PROXY: 'http://10.1.101.101:8080'
-      # HTTPS_PROXY: 'http://10.1.101.101:8080'
+      # HTTP_PROXY: "${HTTP_PROXY:-}"
+      # HTTPS_PROXY: "${HTTPS_PROXY:-}"
     ports:
       - "${HTTP_PORT:-8081}:80"
       - "${HTTPS_PORT:-1443}:443"
