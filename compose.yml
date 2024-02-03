@@ -84,9 +84,9 @@ services:
       - .env
     build:
       args:
-        HTTP_PROXY: ${HTTP_PROXY:-}
-        HTTPS_PROXY: ${HTTPS_PROXY:-}
-        OJS_VERSION: "3_3_0-16"
+        HTTP_PROXY: "${HTTP_PROXY:-}"
+        HTTPS_PROXY: "${HTTPS_PROXY:-}"
+        OJS_VERSION: "${OJS_VERSION:-3_3_0-16}"
         OJS_CLI_INSTALL: "0"
         OJS_DB_HOST: db
         OJS_DB_USER: "${OJS_DB_USER:-ojs}"
