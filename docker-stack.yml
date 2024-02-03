@@ -2,7 +2,7 @@
 # Access via "http://localhost:8081"
 #
 # Call example:
-# $ docker-compose -f stack.yml up
+# $ docker-compose -f docker-stack.yml up
 
 version: "3.9"
 
