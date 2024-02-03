@@ -3,7 +3,7 @@
 - alpine 3.18
 - OJS 3.4.0-1
 - Apache
-- Postgresql
+- Postgresql / Mysql
 - PHP 8.1.26
 
 
