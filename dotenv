@@ -9,3 +9,5 @@ HTTPS_PORT=1443
 OJS_DB_USER=usojssajhom
 OJS_DB_NAME=dbojssajhom
 OJS_DB_PASSWORD=senha@123
+OJS_PUBLIC_PATH=/var/www/html/public
+OJS_PRIVATE_PATH=/var/www/files
