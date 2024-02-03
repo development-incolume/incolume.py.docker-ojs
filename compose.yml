@@ -31,8 +31,8 @@ services:
       inside:
 
   db:
-    image: mariadb:10.2
     restart: unless-stopped
+    image: mariadb:10.2
     env_file:
       - .env
     container_name: "ojs_db_${COMPOSE_PROJECT_NAME:-demo}"
@@ -52,6 +52,7 @@ services:
       - inside
 
   pgsql:
+    restart: unless-stopped
     image: postgres:14-alpine3.19
     env_file:
       - .env
@@ -69,13 +70,13 @@ services:
       https_proxy: ${HTTPS_PROXY:-}
     ports:
       - "5432:5432"
-    restart: unless-stopped
     # volumes:
     #  - ./vol/data:/var/lib/postgresql/data/
     networks:
       inside:
 
   ojs:
+    restart: unless-stopped
     container_name: "ojs_app_${COMPOSE_PROJECT_NAME:-hom}"
     hostname: "${COMPOSE_PROJECT_NAME:-demo}"
     image: incolume/rjp:0.3.0
@@ -116,5 +117,4 @@ services:
     depends_on:
       - db
       - pgsql
-    restart: unless-stopped
 
