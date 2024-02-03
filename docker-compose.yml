@@ -12,6 +12,7 @@ networks:
 
 services:
   db:
+    restart: unless-stopped
     image: mariadb:10.2
     env_file:
       - .env
@@ -28,9 +29,9 @@ services:
 #      - ./volumes/migration:/docker-entrypoint-initdb.d
     networks:
       - inside
-    restart: unless-stopped
 
   ojs:
+    restart: unless-stopped
     image: pkpofficial/ojs:${OJS_VERSION:-3_2_1-4}
     env_file:
       - .env
@@ -53,4 +54,3 @@ services:
       - inside
     depends_on:
       - db
-    restart: unless-stopped
