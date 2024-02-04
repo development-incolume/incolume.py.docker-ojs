@@ -1,0 +1,29 @@
+#!/bin/bash
+
+RED="\033[0;91m"
+YELLOW="\033[0;93m"
+GREEN="\033[0;92m"
+DEFAULT="\033[0m"
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REGEX="^(dev|tags|(enhancement|feature|feat|bug|bugfix|fix|refactor)/epoch#([0-9]+)|([0-9]+\-[a-z0-9_\-]+))$"
+
+if ! [[ $BRANCH =~ $REGEX ]]; then
+  echo -e "${RED}"
+  echo "Your commit was rejected due to branching name incompatible with rules."
+  echo ""
+  echo "Please rename your branch with syntax rules"
+  echo ""
+  echo "syntaxes:"
+  echo "   1: <(enhancement|feature|feat|bug|bugfix|fix)>/epoch#<timestamp>"
+  echo "     Ex:  enhancement/epoch#1234567890"
+  echo ""
+  echo "   2: <id-issue>-slug-title-issue"
+  echo "     Ex: 3-configurar-githooks"
+  echo -e "${DEFAULT}"
+  exit 1
+fi
+
+echo -e "${GREEN}"
+echo "Branching name rules. [OK]"
+echo -e "${DEFAULT}"
